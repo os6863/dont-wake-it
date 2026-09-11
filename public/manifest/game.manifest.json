@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "gameId": "DontWakeItGame",
+  "apiVersion": 1,
+  "defaultLocale": "en",
+  "locales": {
+    "en": {
+      "name": "Don't Wake It",
+      "description": "Steal treasure from a sleeping guardian. Cash out, or risk one more steal."
+    }
+  },
+  "presentation": {
+    "mode": "full-iframe",
+    "hostPanels": {
+      "openSession": false,
+      "history": false,
+      "status": false
+    }
+  },
+  "capabilities": {
+    "openSession": true,
+    "submitAction": true,
+    "forfeitExpiredSession": true,
+    "cancelStuckRandomness": true,
+    "resize": true
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "dont-wake-it",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --port 5173",
+    "test": "vitest run",
+    "check-types": "tsc --noEmit",
+    "simulate-rtp": "node scripts/simulate-rtp.js",
+    "compile-check": "node scripts/compile-check.cjs",
+    "verify": "npm run compile-check && npm run simulate-rtp && npm run check-types"
+  },
+  "dependencies": {
+    "penpal": "^7.0.4",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "viem": "^2.52.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "solc": "0.8.30",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "vitest": "^3.2.4"
+  }
+}
