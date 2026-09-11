@@ -2,6 +2,7 @@ node_modules/
 dist/
 .vercel/
 artifacts/
+cache/
+*.abi.json
 *.log
 .DS_Store
-cache/
