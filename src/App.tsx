@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { parseUnits, formatUnits } from "viem";
 import { computeMaxWager } from "./chain/sdk/guest";
-import { useCasinoHost } from "./chain/useCasinoHost";
+import { useGameHost } from "./chain/useGameHost";
 import {
   findActiveSession,
   findLastSettledSession,
@@ -15,7 +15,7 @@ import { STAGE_COUNT, STAGE_COPY, displayMultiplier, nextStageSurvivalPct } from
 const MAX_MULTIPLIER_X = 12.924165; // stage 6 — keep in sync with contracts/GameMath.sol
 
 export default function App() {
-  const { hostApi, snapshot } = useCasinoHost();
+  const { hostApi, snapshot, isDemo } = useGameHost();
   const [betInput, setBetInput] = useState("10");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,17 +87,17 @@ export default function App() {
   }, [hostApi, lastSettled, revealedSessionId]);
 
   if (!hostApi || !snapshot) {
-    return <Centered>Connecting to Chain…</Centered>;
+    return <Screen isDemo={isDemo}>Connecting to Chain…</Screen>;
   }
 
   if (!walletReady) {
-    return <Centered>Wallet not ready ({snapshot.wallet.status}). Reconnect to continue.</Centered>;
+    return <Screen isDemo={isDemo}>Wallet not ready ({snapshot.wallet.status}). Reconnect to continue.</Screen>;
   }
 
   // --- No active round: betting screen ---
   if (!activeSession) {
     return (
-      <Centered>
+      <Screen isDemo={isDemo}>
         <h1>DON'T WAKE IT</h1>
         <p className="tagline">Steal the treasure. Run before it wakes.</p>
 
@@ -125,19 +125,19 @@ export default function App() {
           {busy ? "…" : "ENTER THE CHAMBER"}
         </button>
         {error && <div className="error">{error}</div>}
-      </Centered>
+      </Screen>
     );
   }
 
   // --- Mid-round: waiting for the VRF result of a STEAL ---
   if (activeSession.phaseName === "WAITING_RANDOMNESS") {
-    return <Centered>The guardian stirs… (resolving)</Centered>;
+    return <Screen isDemo={isDemo}>The guardian stirs… (resolving)</Screen>;
   }
 
   // --- Mid-round: player's turn (STEAL AGAIN or RUN) ---
   const copy = stage >= 1 && stage <= STAGE_COUNT ? STAGE_COPY[stage - 1] : STAGE_COPY[0];
   return (
-    <Centered>
+    <Screen isDemo={isDemo}>
       <h2>{stage === 0 ? "Stage 0 — untouched" : copy.label}</h2>
       <p>{stage === 0 ? "The guardian sleeps deeply." : `${copy.creature} — ${copy.feeling}`}</p>
 
@@ -164,7 +164,7 @@ export default function App() {
         )}
       </div>
       {error && <div className="error">{error}</div>}
-    </Centered>
+    </Screen>
   );
 }
 
@@ -188,6 +188,15 @@ function RoundResultBanner({
   );
 }
 
-function Centered({ children }: { children: React.ReactNode }) {
-  return <div className="screen">{children}</div>;
+function Screen({ children, isDemo }: { children: React.ReactNode; isDemo: boolean }) {
+  return (
+    <div className="screen">
+      {isDemo && (
+        <div className="demo-badge">
+          DEMO MODE — no real transactions (opened outside the Chain host)
+        </div>
+      )}
+      {children}
+    </div>
+  );
 }

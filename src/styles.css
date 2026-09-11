@@ -67,3 +67,18 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .result-banner.win { background: #1e3a2a; color: #7be495; }
 .result-banner.loss { background: #3a1e22; color: #ff8f8f; }
+
+.demo-badge {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 12px;
+  background: #f2c94c;
+  color: #241d33;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.03em;
+  z-index: 10;
+}

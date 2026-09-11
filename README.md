@@ -101,15 +101,34 @@ npm install && npm start
 # simulator/contracts/ — it auto-deploys and registers on the local host.
 ```
 
+## Testing
+
+Two independent layers:
+
+- **`npm run verify`** — solc compile check (pure JS compiler, no native
+  binary needed) + RTP Monte Carlo + TypeScript type-check. Safe to run
+  anywhere, no network access to `binaries.soliditylang.org` required.
+- **`npm run test:contracts`** — real Hardhat unit tests
+  (`test/GameMath.test.cjs`, `test/DontWakeIt.test.cjs`) that deploy the
+  actual contracts and call every `ICasinoGameV2` handler directly (no
+  facet/vault needed — they're plain `external view/pure` functions).
+  Covers: stage-0/stage-6 boundaries, invalid action codes, the "no Stage 7"
+  rule from every angle, `quoteForfeitPayout`, `quoteCaps`/`quoteRiskParams`,
+  and a full steal→steal→RUN walkthrough.
+  **Needs `npx hardhat compile`'s native solc download — this couldn't be
+  executed in the sandbox that built this scaffold (network-restricted).
+  Run it yourself after `npm install` and report back if anything fails.**
+
 ## Status
 
 - [x] Paytable locked and verified (96.00% RTP, closed-form + Monte Carlo)
 - [x] `ICasinoGameV2` implementation compiles clean (solc 0.8.30)
 - [x] Greybox frontend: bet → STEAL/STEAL AGAIN/RUN → result → reveal
+- [x] Hardhat unit tests written for `GameMath` + `DontWakeIt` boundaries —
+      **not yet executed, needs to be run locally** (see Testing above)
 - [ ] End-to-end test against the real local simulator (needs the full
       Node stack — run this yourself with the steps above, or share
       results back for review)
-- [ ] Unit tests for `GameMath` boundary conditions (stage 0, stage 6, invalid stage)
 - [ ] Visual & sound production (Phase 4 — intentionally not started; see
       the project spec's roadmap, "functionality before beauty")
 - [ ] Jam widget verification, standalone hosting, mobile QA
@@ -121,3 +140,19 @@ npm install && npm start
 - No `Math.random()` or client-side outcome logic — the contract is the only
   source of truth (see `src/game/math.ts` header).
 - Jam widget script is in `index.html`.
+
+## Demo mode (standalone playability)
+
+`src/chain/useGameHost.ts` tries the real Chain host bridge first (2s
+timeout). If nothing answers — i.e. the page was opened directly rather than
+embedded by a host — it falls back to `src/chain/demoHost.ts`, a client-side
+mirror of the same stage machine (fake balance, no wallet, no real
+transactions), clearly labeled with an on-screen "DEMO MODE" badge. This
+satisfies the jam's "runs standalone as a playable demo outside the
+chain.wtf iframe" eligibility rule; the reference coinflip example does not
+do this out of the box (its `useCasinoHost` hook comment says opening
+outside the host "never resolves, which is expected").
+
+The real game logic (`GameMath.sol` / `DontWakeIt.sol`) is only exercised
+through the real host + local simulator + eventual chain.wtf integration —
+demo mode never touches it.
