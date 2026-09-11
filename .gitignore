@@ -4,3 +4,5 @@ dist/
 artifacts/
 *.log
 .DS_Store
+
+*.abi.json
