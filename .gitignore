@@ -6,3 +6,4 @@ cache/
 *.abi.json
 *.log
 .DS_Store
+casino-sdk/
